@@ -35,6 +35,8 @@ jobs:
           # With stuff that is repo-dependent in the Apptainer.def file. It looks like
           # There is no way to pass a variable to Apptainer??
           # This could be done elegantly with jinja2 templating, but we will use sed for now
+          # We should instead bind the working dir of the action to a directory in singularity 
+          # So sinngularity can access the code without needing to download it
           sed -i "s/@reponame@/${{ github.event.repository.name }}/g" Apptainer.def
           sed -i "s/@branchname@/${{ github.event.pull_request.head.ref }}/g" Apptainer.def
 
