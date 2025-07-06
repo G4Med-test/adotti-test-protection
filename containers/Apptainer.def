@@ -18,14 +18,17 @@ From: carlomt/geant4:11.2.2-almalinux9
     mkdir -p /workspace
     cd /workspace
 
-    curl -L https://github.com/G4Med-test/LowEFrag/archive/refs/heads/master.tar.gz -o lowefrag.tar.gz
-    tar -xvzf lowefrag.tar.gz --strip-components=1
-    rm lowefrag.tar.gz
+    curl -L https://github.com/G4Med-test/@reponame@/archive/refs/heads/@branchname@.tar.gz -o output.tar.gz
+    tar -xvzf output.tar.gz --strip-components=1
+    rm output.tar.gz
 
-    mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
+    #mkdir build && cd build
+    #cmake ..
+    #make -j$(nproc)
+
+    chmod +x runme.sh
 
 %runscript
-    echo "Running LowEFrag simulation..."
-    /workspace/build/LowEFrag "$@"
+    echo "Running test application..."
+    cd /workspace
+    ./runme.sh
