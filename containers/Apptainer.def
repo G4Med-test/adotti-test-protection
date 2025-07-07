@@ -17,16 +17,11 @@ From: carlomt/geant4:11.2.2-almalinux9
 %post
     mkdir -p /workspace
     cd /workspace
-    # this works only for public repos!
-    # We should bind the working dir of the action to a directory here, where all code is and access it from There
-    # cp -r /somebindeddir .
-    curl -L https://github.com/G4Med-test/@reponame@/archive/refs/heads/@branchname@.tar.gz -o output.tar.gz
-    tar -xvzf output.tar.gz --strip-components=1
-    rm output.tar.gz
-
-    #mkdir build && cd build
-    #cmake ..
-    #make -j$(nproc)
+    ls /mnt
+    cp -r /mnt/* .
+    ls -l
+    chmod +x buildme.sh
+    ./buildme.sh
 
     chmod +x runme.sh
 
