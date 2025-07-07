@@ -1,0 +1,44 @@
+name: Apptainer Build and Deploy
+
+on:
+  pull_request: # Triggers on all pull requests on all branches
+
+jobs:
+  build-test-container:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    # Use the apptainer docker image from carlomt on Docker Hub
+    # Should we move this to a G4Med-test owned container?
+    container:
+      image: carlomt/apptainer:1.3.2
+      options: --privileged
+
+    name: Build and Deploy Container
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set build tag
+        id: set_tag
+        run: |
+          echo "tag=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build Container
+        run: |
+            cd containers
+            # Bind the parent directory to /mnt in the container
+            singularity build --bind ${GITHUB_WORKSPACE}:/mnt "${{ github.event.repository.name }}.sif" Apptainer.def
+
+      - name: Login to GHCR
+        run: |
+          echo ${{ secrets.GHCR_PAT }} | singularity registry login -u ${{ secrets.GHCR_USERNAME }} --password-stdin oras://ghcr.io
+
+      - name: Push Container to GHCR
+        run: |
+          repo_lower=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "Pushing to: oras://ghcr.io/${repo_lower}:${{ steps.set_tag.outputs.tag }}"
+          singularity push containers/${{ github.event.repository.name }}.sif oras://ghcr.io/${repo_lower}:${{ steps.set_tag.outputs.tag }}
